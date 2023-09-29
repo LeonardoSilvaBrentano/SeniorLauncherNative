@@ -1,96 +1,90 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React from "react";
+import { View, Image, StyleSheet, Alert, Linking } from "react-native";
+import HomeButton from "./components/button/HomeButton";
+import * as ImagePicker from "expo-image-picker";
+import { launchCamera } from "react-native-image-picker";
 
 const App = () => {
-  const [activeButton, setActiveButton] = useState(null);
 
-  const handleButtonPressIn = (buttonId) => {
-    setActiveButton(buttonId);
-  };
 
-  const handleButtonPressOut = () => {
-    setActiveButton(null);
-  };
+
+  const captureImage = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+      if (status === "granted") {
+        const result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+          saveToPhotos: true,
+        });
+
+        if (!result.cancelled) {
+          // The image was captured successfully
+          console.log("Image captured:", result.uri);
+        }
+      } else {
+        console.log("Permissão negada");
+        Alert.alert(
+          `Camera permission ${status}`,
+          "O Senior Launcher precisa da sua permissão para abrir sua câmera. Por favor, tente novamente.",
+          [
+            {
+              text: "Settings",
+              onPress: () => Linking.openSettings(),
+            },
+            {
+              text: "Cancel",
+              style: "cancel",
+              onPress: () => {},
+            },
+          ],
+          {
+            cancelable: false,
+          }
+        );
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   return (
     <View style={styles.container}>
       <Image
-        source={require('./assets/cityImagem.jpg')}
+        source={require("./assets/cityImagem.jpg")}
         style={styles.headerImage}
       />
       <View style={styles.headerLine} />
       <View style={styles.buttonRow}>
-
-        <TouchableOpacity
-          style={[
-            styles.button,
-            activeButton === 1 && styles.activeButton,
-          ]}
-          activeOpacity={1}
-          onPressIn={() => handleButtonPressIn(1)}
-          onPressOut={handleButtonPressOut}
-        >
-          <Image source={require('./assets/cameraIcone1.png')} style={styles.buttonImage} />
-          <Text style={styles.buttonText}>
-            <Text>CAMERA -</Text>{"\n"}
-            Toque aqui para abrir a câmera
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.button,
-            activeButton === 2 && styles.activeButton,
-          ]}
-          activeOpacity={1}
-          onPressIn={() => handleButtonPressIn(2)}
-          onPressOut={handleButtonPressOut}
-        >
-          <Image source={require('./assets/galeraIcone2.png')} style={styles.buttonImage} />
-          <Text style={styles.buttonText}>
-            <Text>GALERIA -</Text>{"\n"}
-            Toque aqui para ver suas fotos
-          </Text>
-        </TouchableOpacity>
-
+      
+        <HomeButton
+          imgUrl={require("./assets/cameraIcone1.png")}
+          title="CAMERA -"
+          desc="Toque aqui para abrir a câmera "
+          action={captureImage}
+        />
+        <HomeButton
+          imgUrl={require("./assets/galeraIcone2.png")}
+          title="GALERIA -"
+          desc=" Toque aqui para ver suas fotos"
+        />
       </View>
 
       <View style={styles.buttonRow}>
-
-        <TouchableOpacity
-          style={[
-            styles.button,
-            activeButton === 3 && styles.activeButton,
-          ]}
-          activeOpacity={1}
-          onPressIn={() => handleButtonPressIn(3)}
-          onPressOut={handleButtonPressOut}
-        >
-          <Image source={require('./assets/telefoneIcone3.png')} style={styles.buttonImage} />
-          <Text style={styles.buttonText}>
-            <Text>TELEFONE -</Text>{"\n"}
-            Toque aqui para abrir o telefone
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.button,
-            activeButton === 4 && styles.activeButton,
-          ]}
-          activeOpacity={1}
-          onPressIn={() => handleButtonPressIn(4)}
-          onPressOut={handleButtonPressOut}
-        >
-          <Image source={require('./assets/sosIcone4.png')} style={styles.buttonImage} />
-          <Text style={styles.buttonText}>
-            <Text>SOS -</Text>{"\n"}
-            Toque aqui para emergências
-          </Text>
-        </TouchableOpacity>
-
+        <HomeButton
+          imgUrl={require("./assets/telefoneIcone3.png")}
+          title="TELEFONE -"
+          desc="   Toque aqui para abrir o telefone"
+        />
+        <HomeButton
+          imgUrl={require("./assets/sosIcone4.png")}
+          title="SOS -"
+          desc=" aqui para emergências"
+        />
       </View>
-
     </View>
   );
 };
@@ -98,48 +92,26 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#8F9EA5', // Definindo a cor de fundo
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#8F9EA5", // Definindo a cor de fundo
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerImage: {
-    width: '90%', // Ocupa quase toda a largura da tela
-    height: 200,   // Ajuste conforme necessário
-    resizeMode: 'cover',
+    width: "90%", // Ocupa quase toda a largura da tela
+    height: 200, // Ajuste conforme necessário
+    resizeMode: "cover",
     borderRadius: 20,
-    borderColor: '#000',
+    borderColor: "#000",
     borderWidth: 1,
   },
   headerLine: {
-    width: '100%',
+    width: "100%",
     borderBottomWidth: 1,
-    borderBottomColor: '#000',
+    borderBottomColor: "#000",
     marginVertical: 10,
   },
   buttonRow: {
-    flexDirection: 'row',
-  },
-  button: {
-    width: 160,
-    height: 170,
-    backgroundColor: '#D9D9D9',
-    borderRadius: 20,
-    borderColor: '#000',
-    borderWidth: 1,
-    margin: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  activeButton: {
-    transform: [{ scale: 0.9 }],
-  },
-  buttonImage: {
-    width: 100,
-    height: 100,
-  },
-  buttonText: {
-    marginTop: 5,
-    textAlign: 'center', // Alinhar o texto ao centro
+    flexDirection: "row",
   },
 });
 
